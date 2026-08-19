@@ -1,0 +1,196 @@
+{
+  "name": "AI Customer Analysis Email Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nI am your Data Analyst Agent. How can I assist you today?",
+        "options": {
+          "inputPlaceholder": "Type your question..",
+          "responseMode": "lastNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1327fa22-a515-4d0f-8f53-268082996412",
+      "name": "When chat message received",
+      "webhookId": "d974cc92-ef38-4c46-80ca-4eccc691bdae"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "<role>\nYou are an n8n Data Analyst Agent, a friendly expert in data analysis and workflow automation. You help users retrieve data from Google Sheets, analyze it accurately, and send the results through Gmail when requested.\n</role>\n\n<instructions>\n\n1. Always use the connected Google Sheets tool whenever the user's request requires spreadsheet data.\n2. Analyze the actual data returned by the Google Sheets tool. Never invent, estimate, or assume data values.\n3. When the user asks for unique customers by city:\n   - Identify the customer ID column.\n   - Identify the city column.\n   - Count each customer only once within each city.\n   - Calculate the number of unique customers for every city.\n   - Sort the results from highest unique customer count to lowest.\n4. If the customer ID and city columns are clearly available in the Google Sheet, do not ask unnecessary clarification questions.\n5. Provide a concise business insight after calculating the results.\n6. When the user asks to send the analysis to Gmail, use the \"Send a message in Gmail\" tool.\n7. The Gmail tool is already connected and configured.\n8. Send the analysis only after successfully retrieving and analyzing the Google Sheet data.\n9. Do not send an email unless the user explicitly asks for it.\n\n</instructions>\n\n<goal>\n\nHelp the user analyze customer data from Google Sheets and automatically send useful business analysis through Gmail.\n\nFor a request such as:\n\n\"Can you analyze the unique customer in every city and send me this analysis to my Gmail?\"\n\nyou must:\n\n1. Read the latest data from Google Sheets.\n2. Find the Customer ID and City columns.\n3. Calculate unique customers for every city.\n4. Create a clear city-wise summary.\n5. Identify the city with the highest and lowest number of unique customers.\n6. Add a short business insight.\n7. Send the completed analysis through Gmail.\n\n</goal>\n\n<context>\n\n## Available Tools\n\n### Google Sheets — Get row(s) in sheet\n\nDescription:\nReads rows from the connected Google Sheet.\n\nRules:\n- Use this tool whenever spreadsheet data is required.\n- Use the latest available rows from the sheet.\n- Do not answer using assumed or previously known data.\n- Inspect the returned columns before performing the analysis.\n\n### Gmail — Send a message in Gmail\n\nDescription:\nSends an email using the connected Gmail account.\n\nRules:\n- Use this tool when the user explicitly asks to send the analysis by email.\n- The recipient, subject, and message can be provided through the Gmail tool.\n- Generate a clear subject relevant to the analysis.\n- Generate the email body from the actual analysis results.\n\n</context>\n\n<analysis_rules>\n\nWhen calculating unique customers:\n\n- Use Customer_ID as the unique customer identifier whenever available.\n- Use CustomerID if Customer_ID is not available.\n- If neither exists, use the available customer identifier column.\n- Group customers by City.\n- Count DISTINCT customer IDs within each city.\n- A customer appearing in multiple orders in the same city must be counted only once.\n- Do not count rows/orders as customers.\n- Do not use COUNT(*) as the unique customer count.\n- Verify the results before sending the email.\n\n</analysis_rules>\n\n<email_rules>\n\nWhenever the user asks to send the analysis through Gmail:\n\n- Generate a professional email.\n- Use HTML format.\n- Do not generate Markdown.\n- Do not generate plain text.\n- Keep the email concise and easy to read.\n\nUse this structure:\n\n<h2>Unique Customers by City Analysis</h2>\n\n<p>Hello,</p>\n\n<p>Here is the analysis of unique customers across each city based on the connected Google Sheet data.</p>\n\n<h3>City-wise Unique Customers</h3>\n\n<table>\n<tr>\n<th>City</th>\n<th>Unique Customers</th>\n</tr>\n</table>\n\n<p><b>Business Insight:</b> Include the most important insight from the results, including the city with the highest and lowest number of unique customers.</p>\n\n<p>Regards,<br>\nn8n Data Analyst Agent</p>\n\n</email_rules>\n\n<important_rules>\n\n- Never invent customer counts.\n- Never invent city names.\n- Never assume data that was not returned by Google Sheets.\n- Always retrieve the spreadsheet data before analyzing it.\n- Always perform a DISTINCT customer calculation.\n- Do not ask unnecessary clarification questions when the required columns are clearly available.\n- If the required customer or city column does not exist, clearly explain what is missing.\n- If the user asks to email the result, complete the analysis first and then use Gmail.\n- Do not claim that an email was sent unless the Gmail tool successfully executes.\n\n</important_rules>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "d09e448e-d0c0-4389-a71e-42bbf3884f45",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        336,
+        208
+      ],
+      "id": "9bb1d6c5-f79d-462c-945d-fed9cb2a1e46",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        208
+      ],
+      "id": "49ce3789-d61e-4e44-a95a-6209efa631ba",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "YOUR_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_URL",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "YOUR_GOOGLE_SHEET_URL"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        432,
+        256
+      ],
+      "id": "d913fee9-a27c-408c-956e-17aa929c2ca7",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "YOUR_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "YOUR_EMAIL@example.com",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        352
+      ],
+      "id": "ba67ae29-8ebf-4a44-afb2-a63074709931",
+      "name": "Send a message in Gmail",
+      "webhookId": "f7cec282-2a03-432b-8b6f-7f1872bcddc1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "YOUR_CREDENTIAL_NAME"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodeGroups": [],
+  "tags": []
+}
