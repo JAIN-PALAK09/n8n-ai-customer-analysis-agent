@@ -96,3 +96,11 @@ The JSON file contains the complete automation workflow and can be imported into
 **Palak Jain**
 
  Data Analyst | AI Automation Enthusiast | Data Analytics
+
+ ## Screenshots
+
+### n8n Workflow
+![n8n Workflow](Screenshot%202026-08-19%20224008.png)
+
+### Gmail Output
+![Gmail Output](Screenshot%202026-08-19%20224322.png)
