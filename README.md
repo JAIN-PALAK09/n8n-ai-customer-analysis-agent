@@ -8,17 +8,31 @@ This project demonstrates how AI can be used to automate customer analysis and e
 
 The agent takes customer information as input, analyzes the data using AI, and generates a relevant email response based on the customer's situation.
 
-## ⚙️ Workflow
 
-Customer Information  
-↓  
-AI Customer Analysis  
-↓  
-Generate Personalized Email  
-↓  
-Gmail  
-↓  
-Send Email
+## 🏗️ Workflow Architecture
+
+The AI Customer Analysis Email Agent follows this automated workflow:
+
+**User Query**
+↓
+**AI Agent**
+↓
+**Google Sheets**
+↓
+**Customer Data Analysis**
+↓
+**Business Insight Generation**
+↓
+**Gmail Email Automation**
+
+### How It Works
+
+1. The user sends a customer analysis request through the chat interface.
+2. The AI Agent identifies the required customer and city information.
+3. Google Sheets provides the latest customer data.
+4. The AI Agent calculates unique customers for each city.
+5. The agent generates a concise business insight.
+6. If requested, the analysis is automatically formatted and sent through Gmail.
 
 ## ✨ Key Features
 
@@ -31,11 +45,15 @@ Send Email
 
 ## 🛠️ Technologies Used
 
-- AI / LLM
-- Gmail
+- n8n
+- OpenAI
+- Google Sheets
+- Gmail API
+- AI Agent / LLM
 - Workflow Automation
-- JSON
 - API Integration
+- JSON
+
 
 ## 🎯 Business Use Case
 
@@ -77,4 +95,4 @@ The JSON file contains the complete automation workflow and can be imported into
 
 **Palak Jain**
 
-Aspiring Data Analyst | AI Automation Enthusiast
+ Data Analyst | AI Automation Enthusiast | Data Analytics
